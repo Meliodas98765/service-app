@@ -1,11 +1,10 @@
 from flask import Flask, render_template
 
 app = Flask(__name__)
-# test123
 
 @app.route('/')
 def index():
-    mountains = ['Everest', 'K2', 'Kilimanjaro','Kailash','Fuji','Himalayas']
+    mountains = ['Everest', 'K2', 'Kilimanjaro','Kailash','Fuji','Himalayas','Mount Elbrus']
     return render_template('index.html', mountain=mountains)
 
 @app.route('/mountain/<mt>')
