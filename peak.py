@@ -4,7 +4,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    mountains = ['Everest', 'K2', 'Kilimanjaro','Kailash','Fuji','Himalayas','Mount Elbrus']
+    mountains = ['Everest', 'K2', 'Kilimanjaro','Kailash','Fuji','Himalayas','Mount Elbrus','Mount Kilimanjaro']
     return render_template('index.html', mountain=mountains)
 
 @app.route('/mountain/<mt>')
