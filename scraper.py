@@ -36,7 +36,7 @@ async def run_scraper(url_list,batch_id):
         if browser is not None:
             await browser.close()
 
-def execute_url_scrapping(url_list,batch_id):
+async def execute_url_scrapping(url_list,batch_id):
     update_status(batch_id,"Launch Successful!!","DESCRIPTION")
     page = await browser.newPage()
 
