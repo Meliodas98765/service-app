@@ -51,7 +51,7 @@ async def fetch_data():
         update_status(request_data['batch_id'],str(datetime.datetime.now())+"-SDK Initiated","INPROGRESS")
 
         # Fetch Records 
-        module_name = "Linkedin_Module_Demopip"
+        module_name = "Linkedin_Module_Demo"
         records = get_records(module_name,request_data['page']) # returns 100 latest records sorted in desc by URL
         print("RECORDS Fetched")
         # Update to log
