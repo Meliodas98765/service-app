@@ -10,7 +10,7 @@ app = Quart(__name__)
 
 @app.route('/live') 
 async def server_live():
-    return "Hii from Server!!" 200
+    return "Hii from Server!!", 200
 @app.route('/fetch_data_test', methods=["POST"]) 
 async def fetch_data_test():
     """
