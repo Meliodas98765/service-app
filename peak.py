@@ -11,13 +11,15 @@ app = Quart(__name__)
 @app.route('/live') 
 async def server_live():
     return "Hii from Server!!", 200
-@app.route('/fetch_data_test', methods=["POST"]) 
+@app.route('/fetch_data_test', methods=["POST","GET"]) 
 async def fetch_data_test():
     """
     params : 
         page - page no
         batch_id - id of the batch
     """
+    if request.method == "GET":
+        return "Hii There from server!!"
     if request.method == 'POST':
         # Get JSON data from the POST request
         request_data = await request.get_json()
