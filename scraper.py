@@ -23,7 +23,15 @@ async def run_scraper(url_list,batch_id):
             execute_url_scrapping(url_list,batch_id)
     except Exception as e:
         if ("Browser closed unexpectedly" in str(e)):
-        update_status(batch_id,"Failed launching Browser","FAILED")
+            update_status(batch_id,"Failed launching Browser","FAILED")
+            # could be due to sandbox check prod mode
+            # inside server env
+            update_status(batch_id,"Launching Browser in Production env..","DESCRIPTION")
+            browser = await launch({
+                'headless': True,
+                'args': ['--no-sandbox'],
+            })
+            execute_url_scrapping(url_list,batch_id)
     finally:
         if browser is not None:
             await browser.close()
