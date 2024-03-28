@@ -11,6 +11,7 @@ async def run_scraper(url_list,batch_id):
         browser = await launch({
             'headless': True,
         })
+        execute_url_scrapping(url_list,batch_id)
     except RuntimeError as e:
         update_status(batch_id,"Failed in sandbox mode","FAILED")
         if (str(e) == "Event loop is closed"):

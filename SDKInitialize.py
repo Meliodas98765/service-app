@@ -3,7 +3,7 @@ from zcrmsdk.src.com.zoho.crm.api.dc import USDataCenter, INDataCenter
 from zcrmsdk.src.com.zoho.api.authenticator.store import DBStore, FileStore
 from zcrmsdk.src.com.zoho.api.logger import Logger
 from zcrmsdk.src.com.zoho.crm.api.initializer import Initializer
-from zcrmsdk.src.com.zoho.api.authenticator.oauth_token import OAuthToken,TokenType
+from zcrmsdk.src.com.zoho.api.authenticator.oauth_token import OAuthToken
 from zcrmsdk.src.com.zoho.crm.api.sdk_config import SDKConfig
 import os
 from dotenv import load_dotenv
@@ -28,6 +28,7 @@ class SDKInitializer(object):
         try:
             token = OAuthToken(client_id=client_id, client_secret=client_secret, redirect_url="https://www.google.com",refresh_token=refresh_token)
         except TypeError:
+            from zcrmsdk.src.com.zoho.api.authenticator.oauth_token import TokenType
             # Different lib version 
             token = OAuthToken(client_id=client_id, client_secret=client_secret, redirect_url="https://www.google.com",token=refresh_token,token_type=TokenType.REFRESH)
         store = FileStore(file_path='./python_sdk_tokens.txt')
