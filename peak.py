@@ -64,7 +64,7 @@ async def fetch_data():
 
         # Set/ Update proxy
         # Start Scrapper
-        await start_scrapper(records)
+        await start_scrapper(records,request_data['batch_id'])
         print("PROFILES Fetched")
         # Update to log
         update_status(request_data['batch_id'],str(datetime.datetime.now())+"-PROFILES Fetched","INPROGRESS")
@@ -100,12 +100,12 @@ def update_status(batch_id,log,status):
         json.dump(status_data, file, indent=2)
 
 
-async def start_scrapper(records):
+async def start_scrapper(records,batch_id):
     url_list = []
     for record in records["record_lsit"]:
         url_list.append(record.get_key_value("Name"))
     # async def run_scraper_async(url_list):
-    await run_scraper(url_list)
+    await run_scraper(url_list,batch_id)
 
     # await run_scraper_async(url_list)
 
