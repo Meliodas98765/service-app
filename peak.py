@@ -20,10 +20,13 @@ async def fetch_data_test():
     """
     if request.method == 'POST':
         # Get JSON data from the POST request
-        request_data = request.get_json()
+        request_data = await request.get_json()
         print(request_data['page'])
         print(request_data['batch_id'])
-        return "OK", 200
+        return {
+            "page":request_data['page'],
+            "batch_d":request_data['batch_id']
+        }, 200
     
 @app.route('/fetch_data', methods=["POST"]) 
 async def fetch_data():
