@@ -93,6 +93,7 @@ async def execute_test():
     print("Test executed!!")
 
 async def start_flow(request_data):
+    global is_task_running
     """
     Initialize SDK
     getRecords for 'page'
@@ -129,6 +130,7 @@ async def start_flow(request_data):
     print("PROFILES Updated")
     # Update to log
     update_status(request_data['batch_id'],str(datetime.datetime.now())+"-PROFILES Updated","COMPLETED")
+    is_task_running = False
 
 def update_status(batch_id,log,status):
     print("BATCH_ID : "+batch_id + "\n LOG : " + log + "\n STATUS : " +status )
