@@ -4,8 +4,15 @@ from SDKInitialize import SDKInitializer
 from Functions import get_records, update_records
 from scraper import run_scraper
 import asyncio, os, subprocess, json, datetime
+from dotenv import load_dotenv
+
+load_dotenv()
 app = Quart(__name__)
 
+node = os.getenv("NODE")
+task_semaphore = asyncio.Semaphore(1)  # Allow only one task at a time
+request_queue = asyncio.Queue()
+is_task_running = False
 # create 
 
 @app.route('/live') 
@@ -25,6 +32,7 @@ async def fetch_data_test():
         request_data = await request.get_json()
         print(request_data['page'])
         print(request_data['batch_id'])
+        task = asyncio.create_task(execute_test())
         return {
             "page":request_data['page'],
             "batch_d":request_data['batch_id']
@@ -39,44 +47,88 @@ async def fetch_data():
     """
     if request.method == 'POST':
         # Get JSON data from the POST request
+
         request_data = await request.get_json()
         print(request_data['page'])
-        
-        """
-        Initialize SDK
-        getRecords for 'page'
-        set/change proxy and burner account
-        call scrapper
-        update Records
-        """
-        sdk = SDKInitializer()
-        sdk.initialize()
-        print("SDK Initiated")
-        # Update to log
-        update_status(request_data['batch_id'],str(datetime.datetime.now())+"-SDK Initiated","INPROGRESS")
 
-        # Fetch Records 
-        module_name = "Linkedin_Module_Demo"
-        records = get_records(module_name,request_data['page']) # returns 100 latest records sorted in desc by URL
-        print("RECORDS Fetched")
-        # Update to log
-        update_status(request_data['batch_id'],str(datetime.datetime.now())+"-RECORDS Fetched","INPROGRESS")
+        task_status = await check_tasks()
 
-        # Set/ Update proxy
-        # Start Scrapper
-        await start_scrapper(records,request_data['batch_id'])
-        print("PROFILES Fetched")
-        # Update to log
-        update_status(request_data['batch_id'],str(datetime.datetime.now())+"-PROFILES Fetched","INPROGRESS")
+        if task_status:
+            return {
+                "status":200,
+                "message":"Job already running.."
+            }, 200
+        else:
+            task_created = await create_task(request_data)
+            if task_created:
+                return {
+                    "status":200,
+                    "message":"Job initiated successfully"
+                }, 200
+            else:
+                return {
+                    "status":500,
+                    "message":"Failed initiating job. Please try again"
+                }, 200
 
-        # Update to CRM
-        update_to_crm(records,module_name)
-        print("PROFILES Updated")
-        # Update to log
-        update_status(request_data['batch_id'],str(datetime.datetime.now())+"-PROFILES Updated","COMPLETED")
+async def check_tasks():
+    return is_task_running
 
+async def create_task(request_data):
+    global is_task_running
+    if is_task_running:
+        return False  # Task already running
 
-        return "OK", 200
+    async with task_semaphore:
+        # Check if there are pending requests in the queue
+        if not request_queue.empty():
+            return False  # Block task creation for same type of request
+
+        is_task_running = True
+        asyncio.create_task(start_flow(request_data))
+        return True
+
+async def execute_test():
+    asyncio.sleep(1)
+    print("Test executed!!")
+
+async def start_flow(request_data):
+    """
+    Initialize SDK
+    getRecords for 'page'
+    set/change proxy and burner account
+    call scrapper
+    update Records
+    """
+    asyncio.sleep(5) # handover to fetch_data to respond
+
+    sdk = SDKInitializer()
+    sdk.initialize()
+    print("SDK Initiated")
+    # Update to log
+    update_status(request_data['batch_id'],str(datetime.datetime.now())+"-SDK Initiated","INPROGRESS")
+
+    # Fetch Records 
+    module_name = "Linkedin_Module_Demo"
+    records = get_records(module_name,request_data['page']) # returns 100 latest records sorted in desc by URL
+    print (records)
+    print("RECORDS Fetched")
+    # Update to log
+    update_status(request_data['batch_id'],str(datetime.datetime.now())+"-RECORDS Fetched","INPROGRESS")
+
+    # Set/ Update proxy
+    # Start Scrapper
+    await start_scrapper(records,request_data['batch_id'])
+    # await start_scrapper(records,request_data['batch_id'])
+    print("PROFILES Fetched")
+    # Update to log
+    update_status(request_data['batch_id'],str(datetime.datetime.now())+"-PROFILES Fetched","INPROGRESS")
+
+    # Update to CRM
+    update_to_crm(records,module_name)
+    print("PROFILES Updated")
+    # Update to log
+    update_status(request_data['batch_id'],str(datetime.datetime.now())+"-PROFILES Updated","COMPLETED")
 
 def update_status(batch_id,log,status):
     print("BATCH_ID : "+batch_id + "\n LOG : " + log + "\n STATUS : " +status )
@@ -104,13 +156,14 @@ async def start_scrapper(records,batch_id):
     url_list = []
     for record in records["record_lsit"]:
         url_list.append(record.get_key_value("Name"))
+    print(url_list)
     # async def run_scraper_async(url_list):
     await run_scraper(url_list,batch_id)
 
     # await run_scraper_async(url_list)
 
     # execute driver.js
-    js_cmd = ["node","driver.js"]
+    js_cmd = [node,"driver.js"]
     subprocess.run(js_cmd,check =True)
     return "Scrape Completed"
 
