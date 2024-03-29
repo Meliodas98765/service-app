@@ -3,11 +3,14 @@ from quart import Quart, request, render_template
 from SDKInitialize import SDKInitializer
 from Functions import get_records, update_records
 from scraper import run_scraper
-import asyncio, os, subprocess, json, datetime
+import asyncio, os, subprocess, json, datetime, logging
 from dotenv import load_dotenv
 
 load_dotenv()
 app = Quart(__name__)
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 node = os.getenv("NODE")
 task_semaphore = asyncio.Semaphore(1)  # Allow only one task at a time
@@ -106,6 +109,7 @@ async def start_flow(request_data):
     sdk = SDKInitializer()
     sdk.initialize()
     print("SDK Initiated")
+    logging.info("SDK Initialized")
     # Update to log
     update_status(request_data['batch_id'],str(datetime.datetime.now())+"-SDK Initiated","INPROGRESS")
 
@@ -114,6 +118,7 @@ async def start_flow(request_data):
     records = get_records(module_name,request_data['page']) # returns 100 latest records sorted in desc by URL
     print (records)
     print("RECORDS Fetched")
+    logging.info("RECORDS Fetched")
     # Update to log
     update_status(request_data['batch_id'],str(datetime.datetime.now())+"-RECORDS Fetched","INPROGRESS")
 
@@ -122,12 +127,14 @@ async def start_flow(request_data):
     await start_scrapper(records,request_data['batch_id'])
     # await start_scrapper(records,request_data['batch_id'])
     print("PROFILES Fetched")
+    logging.info("PROFILES Fetched")
     # Update to log
     update_status(request_data['batch_id'],str(datetime.datetime.now())+"-PROFILES Fetched","INPROGRESS")
 
     # Update to CRM
     update_to_crm(records,module_name)
     print("PROFILES Updated")
+    logging.info("PROFILES Updated")
     # Update to log
     update_status(request_data['batch_id'],str(datetime.datetime.now())+"-PROFILES Updated","COMPLETED")
     is_task_running = False
