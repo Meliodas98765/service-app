@@ -173,7 +173,7 @@ async def start_scrapper(records,batch_id):
     # await run_scraper_async(url_list)
 
     # execute driver.js
-    js_cmd = [node,"driver.js"]
+    js_cmd = ["sudo",node,"driver.js"]
     subprocess.run(js_cmd,check =True)
     return "Scrape Completed"
 
