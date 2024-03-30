@@ -14,7 +14,11 @@ async def run_scraper(url_list,batch_id):
         browser = await launch({
             'headless': True,
             'args': ['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage'],
-        })
+        },
+        handleSIGINT=False,
+        handleSIGTERM=False,
+        handleSIGHUP=False
+        )
     except pyppeteer.errors.BrowserError as be:
         if browser not None:
             browser.close()
