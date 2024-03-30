@@ -2,10 +2,12 @@ import asyncio, os, random, logging
 from pyppeteer import launch
 from pyppeteer_stealth import stealth
 from pyppeteer.browser import Browser
+from dotenv import load_dotenv
 
+load_dotenv()
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logging.basicConfig(level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
-
+exec_path = os.getenv("CHROME_DRIVER")
 # Batch of 10 reads and change proxy
 async def run_scraper(url_list,batch_id):
     logging.info("Starting Scraper")
@@ -13,6 +15,7 @@ async def run_scraper(url_list,batch_id):
     try:
         browser = await launch({
             'headless': True,
+            'executablePath': exec_path,
             'args': ['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage'],
         },
         handleSIGINT=False,
@@ -20,7 +23,7 @@ async def run_scraper(url_list,batch_id):
         handleSIGHUP=False
         )
     except pyppeteer.errors.BrowserError as be:
-        if browser not None:
+        if browser is not None:
             browser.close()
         return -1
     logging.info("Browser Initiated")
