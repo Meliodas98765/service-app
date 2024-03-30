@@ -9,11 +9,16 @@ logging.basicConfig(level=logging.ERROR, format='%(asctime)s - %(levelname)s - %
 # Batch of 10 reads and change proxy
 async def run_scraper(url_list,batch_id):
     logging.info("Starting Scraper")
-    
-    browser = await launch({
-        'headless': True,
-        'args': ['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage'],
-    })
+    browser = None
+    try:
+        browser = await launch({
+            'headless': True,
+            'args': ['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage'],
+        })
+    except pyppeteer.errors.BrowserError as be:
+        if browser not None:
+            browser.close()
+        return -1
     logging.info("Browser Initiated")
     page = await browser.newPage()
     logging.info("Browser Open New Page")
