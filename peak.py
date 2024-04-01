@@ -117,6 +117,7 @@ async def start_flow(request_data):
     module_name = "Linkedin_Module_Demo"
     records = get_records(module_name,request_data['page']) # returns 100 latest records sorted in desc by URL
     print (records)
+    logging.info(records)
     print("RECORDS Fetched")
     logging.info("RECORDS Fetched")
     # Update to log
