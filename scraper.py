@@ -14,9 +14,14 @@ passkey = os.getenv("PASSKEY")
 async def run_scraper(url_list,batch_id):
     logging.info("Starting Scraper")
     browser = await launch({
-        'headless': True,
-        'args': ['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage'],
-    })
+            'headless': True,
+            'executablePath': exec_path,
+            'args': ['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage','--enable-logging', '--v=1', '--log-file=chrome.log'],
+        },
+        handleSIGINT=False,
+        handleSIGTERM=False,
+        handleSIGHUP=False
+        )
     logging.info("Browser Initiated")
     page = await browser.newPage()
     logging.info("Browser Open New Page")
