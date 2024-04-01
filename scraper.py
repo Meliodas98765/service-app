@@ -24,7 +24,7 @@ async def run_scraper(url_list,batch_id):
         handleSIGTERM=False,
         handleSIGHUP=False
         )
-    except pyppeteer.errors.BrowserError as be:
+    except Exception as be:
         if browser is not None:
             browser.close()
         return -1
