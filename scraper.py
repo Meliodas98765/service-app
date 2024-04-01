@@ -14,7 +14,7 @@ passkey = os.getenv("PASSKEY")
 async def run_scraper(url_list,batch_id):
     logging.info("Starting Scraper")
     browser = await launch({
-        'headless': False,
+        'headless': True,
         'args': ['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage'],
     })
     logging.info("Browser Initiated")
@@ -33,10 +33,11 @@ async def run_scraper(url_list,batch_id):
 
     # go_to_url = "https://www.linkedin.com/in/theharishnarayanan/"
         print(go_to_url)
+        logging.info("working on this ",go_to_url)
         file_path = "sources/"+go_to_url.split("https://www.linkedin.com/in/")[1].replace("/","") + ".html"
         if not os.path.exists(file_path):  # Temporary
             await page.goto(go_to_url)
-
+            logging.info(go_to_url, "opened")
             await asyncio.sleep(random.uniform(15, 35))
 
             page_source = await page.content()
@@ -46,7 +47,7 @@ async def run_scraper(url_list,batch_id):
                 file.write(page_source)
         else: # Temporary
             print(f"File {file_path} already exists. Skipping writing page content.")
-
+            logging.info(f"File {file_path} already exists. Skipping writing page content.")
         await asyncio.sleep(random.uniform(20, 60))
 
     await browser.close()  # Close the browser
