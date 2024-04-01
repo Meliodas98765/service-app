@@ -38,11 +38,11 @@ async def run_scraper(url_list,batch_id):
 
     # go_to_url = "https://www.linkedin.com/in/theharishnarayanan/"
         print(go_to_url)
-        logging.info("working on this ",go_to_url)
+        logging.info("working on this "+go_to_url)
         file_path = "sources/"+go_to_url.split("https://www.linkedin.com/in/")[1].replace("/","") + ".html"
         if not os.path.exists(file_path):  # Temporary
             await page.goto(go_to_url)
-            logging.info(go_to_url, "opened")
+            logging.info(go_to_url+" opened")
             await asyncio.sleep(random.uniform(15, 35))
 
             page_source = await page.content()
