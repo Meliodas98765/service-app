@@ -8,26 +8,15 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logging.basicConfig(level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
 exec_path = os.getenv("CHROME_DRIVER")
-user_email = os.getenv("USER_EMAIL")
+user_email = os.getenv("USER_EMAILID")
 passkey = os.getenv("PASSKEY")
 # Batch of 10 reads and change proxy
 async def run_scraper(url_list,batch_id):
     logging.info("Starting Scraper")
-    browser = None
-    try:
-        browser = await launch({
-            'headless': True,
-            'executablePath': exec_path,
-            'args': ['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage'],
-        },
-        handleSIGINT=False,
-        handleSIGTERM=False,
-        handleSIGHUP=False
-        )
-    except Exception as be:
-        if browser is not None:
-            browser.close()
-        return -1
+    browser = await launch({
+        'headless': False,
+        'args': ['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage'],
+    })
     logging.info("Browser Initiated")
     page = await browser.newPage()
     logging.info("Browser Open New Page")
@@ -43,7 +32,7 @@ async def run_scraper(url_list,batch_id):
     for go_to_url in url_list:
 
     # go_to_url = "https://www.linkedin.com/in/theharishnarayanan/"
-        # print(go_to_url)
+        print(go_to_url)
         file_path = "sources/"+go_to_url.split("https://www.linkedin.com/in/")[1].replace("/","") + ".html"
         if not os.path.exists(file_path):  # Temporary
             await page.goto(go_to_url)
@@ -62,6 +51,10 @@ async def run_scraper(url_list,batch_id):
 
     await browser.close()  # Close the browser
     
+    # except Exception as be:
+    #     if browser is not None:
+    #         browser.close()
+    #     return -1
 
     # try:
     #     update_status(batch_id,"Launching Browser..","DESCRIPTION")
@@ -120,11 +113,12 @@ async def execute_url_scrapping(url_list,batch_id,browser):
     for go_to_url in url_list:
 
     # go_to_url = "https://www.linkedin.com/in/theharishnarayanan/"
-        # print(go_to_url)
+        print(go_to_url)
+        logging.info("Working on ",go_to_url)
         file_path = "sources/"+go_to_url.split("https://www.linkedin.com/in/")[1].replace("/","") + ".html"
         if not os.path.exists(file_path):  # Temporary
             await page.goto(go_to_url)
-
+            logging.info(go_to_url, " opened")
             await asyncio.sleep(random.uniform(15, 35))
 
             page_source = await page.content()
@@ -134,7 +128,7 @@ async def execute_url_scrapping(url_list,batch_id,browser):
                 file.write(page_source)
         else: # Temporary
             print(f"File {file_path} already exists. Skipping writing page content.")
-
+            logging.info(f"File {file_path} already exists. Skipping writing page content.")
         await asyncio.sleep(random.uniform(20, 60))
     browser.close()
 
