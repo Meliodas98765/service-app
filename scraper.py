@@ -15,7 +15,6 @@ async def run_scraper(url_list,batch_id):
     logging.info("Starting Scraper")
     browser = await launch({
             'headless': True,
-            'executablePath': exec_path,
             'args': ['--no-sandbox','--disable-setuid-sandbox','--disable-dev-shm-usage','--enable-logging', '--v=1', '--log-file=chrome.log'],
         },
         handleSIGINT=False,
