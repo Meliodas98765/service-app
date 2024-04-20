@@ -56,6 +56,8 @@ async def run_scraper(url_list,batch_id):
     await page.type('div.form__input--floating input#password', passkey)
     await page.click('div.login__form_action_container > button', waitUntil='networkidle0')
     logging.info("Sign In Successfull")
+    page_content = await page.content()
+    create_file("sign_in.html",page_content,'templates/')
     await asyncio.sleep(random.uniform(5, 15))
 
     for go_to_url in url_list:
