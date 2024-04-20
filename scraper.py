@@ -189,4 +189,5 @@ def update_status(batch_id,log,status):
         json.dump(status_data, file, indent=2)
 
 def run_test
+    pass
 # asyncio.get_event_loop().run_until_complete(run_scraper())
