@@ -27,6 +27,7 @@ async def run_scraper(url_list,batch_id):
     await stealth(page)
     await page.goto('https://www.linkedin.com/checkpoint/rm/sign-in-another-account?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin')
     # check if login page is visible
+    page_content = await page.content()
     if "Already on Linkedin?" in page_content:
         # Find the button with the text "Sign In" using Pyppeteer's evaluate function
         sign_in_button = await page.evaluate('''() => {
