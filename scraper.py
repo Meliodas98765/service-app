@@ -27,6 +27,7 @@ async def run_scraper(url_list,batch_id):
     await stealth(page)
     await page.goto('https://www.linkedin.com/checkpoint/rm/sign-in-another-account?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin')
     # check if login page is visible
+    await page.waitForNavigation()
     page_content = await page.content()
     create_file("start_page.html",page_content,"templates/")
     if "Already on Linkedin?" in page_content:
@@ -56,6 +57,7 @@ async def run_scraper(url_list,batch_id):
     await page.type('div.form__input--floating input#password', passkey)
     await page.click('div.login__form_action_container > button', waitUntil='networkidle0')
     logging.info("Sign In Successfull")
+    await page.waitForNavigation()
     page_content = await page.content()
     create_file("sign_in.html",page_content,'templates/')
     await asyncio.sleep(random.uniform(5, 15))
