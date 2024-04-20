@@ -27,6 +27,29 @@ async def run_scraper(url_list,batch_id):
     logging.info("Browser Open New Page")
     await stealth(page)
     await page.goto('https://www.linkedin.com/checkpoint/rm/sign-in-another-account?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin')
+    # check if login page is visible
+    if "Already on Linkedin?" in page_content:
+        # Find the button with the text "Sign In" using Pyppeteer's evaluate function
+        sign_in_button = await page.evaluate('''() => {
+            const buttons = document.querySelectorAll('button');
+            for (const button of buttons) {
+                if (button.textContent.trim() === 'Sign In') {
+                    return button;
+                }
+            }
+            return null;
+        }''')
+
+        if sign_in_button:
+            # Click on the button
+            await sign_in_button.click()
+            print("Clicked on the 'Sign In' button")
+        else:
+            print("Button with text 'Sign In' not found")
+    else:
+        print("Text 'Already on Linkedin?' not found")
+
+
     logging.info("Browser Open Login Page")
     await page.type('div.form__input--floating input#username', user_email)
     await page.type('div.form__input--floating input#password', passkey)
@@ -110,6 +133,10 @@ async def execute_url_scrapping(url_list,batch_id,browser):
     await stealth(page)
     await page.goto('https://www.linkedin.com/login')
 
+    # # check if login page
+    # page_source = await page.content()
+    
+
     await page.type('div.form__input--floating input#username', 'pandasidharthjitendra@gmail.com')
     await page.type('div.form__input--floating input#password', 'Meliodas#1')
     await page.click('div.login__form_action_container > button', waitUntil='networkidle0')
@@ -162,4 +189,5 @@ def update_status(batch_id,log,status):
     with open("status.json", "w") as file:
         json.dump(status_data, file, indent=2)
 
+def run_test
 # asyncio.get_event_loop().run_until_complete(run_scraper())
