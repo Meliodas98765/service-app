@@ -28,6 +28,7 @@ async def run_scraper(url_list,batch_id):
     await page.goto('https://www.linkedin.com/checkpoint/rm/sign-in-another-account?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin')
     # check if login page is visible
     page_content = await page.content()
+    create_file("start_page.html",page_content,"templates/")
     if "Already on Linkedin?" in page_content:
         # Find the button with the text "Sign In" using Pyppeteer's evaluate function
         sign_in_button = await page.evaluate('''() => {
@@ -124,6 +125,15 @@ async def run_scraper(url_list,batch_id):
     #             await execute_url_scrapping(url_list,batch_id,browser)
     #         except Exception as e:
     #             update_status(batch_id,"Scrapping Failed","FAILED")
+
+def create_file(file_name,file_content,path):
+
+    # Open the file in write mode ('w') - this will create the file if it doesn't exist
+    with open(os.path.join(path,file_name), 'w') as file:
+        # Write content into the file
+        file.write(file_content)
+
+    print(f"File '{file_name}' has been created.")
 
 
 async def execute_url_scrapping(url_list,batch_id,browser):
